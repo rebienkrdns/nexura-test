@@ -73,6 +73,13 @@ function borrarEmpleado(id) {
                     }).then((result) => {
                         window.location.reload()
                     })
+                    toastr["success"]("Empleado borrado correctamente", "");
+                },
+                error: function (r) {
+                    toastr["error"]("Empleado no existe", "");
+                    sampleVar = setTimeout(() => {
+                        window.location.reload()
+                    }, 3000);
                 }
             })
         }

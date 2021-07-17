@@ -39,24 +39,28 @@ class GestionController extends Controller
      */
     public function store(Request $request)
     {
-        $empleadoNuevo = Empleado::create([
-            "nombre" => $request->nombre,
-            "email" => $request->correo,
-            "sexo" => $request->sexo,
-            "area_id" => $request->area,
-            "descripcion" => $request->descripcion,
-            "boletin" => isset($request->boletin) ? 1 : 0
-        ]);
+        try {
+            $empleadoNuevo = Empleado::create([
+                "nombre" => $request->nombre,
+                "email" => $request->correo,
+                "sexo" => $request->sexo,
+                "area_id" => $request->area,
+                "descripcion" => $request->descripcion,
+                "boletin" => isset($request->boletin) ? 1 : 0
+            ]);
 
-        foreach (Rol::all() as $rol) {
-            if ($request->get("rol$rol->id")) {
-                EmpleadoRol::create([
-                    'empleado_id' => $empleadoNuevo->id,
-                    'rol_id' => $rol->id
-                ]);
+            foreach (Rol::all() as $rol) {
+                if ($request->get("rol$rol->id")) {
+                    EmpleadoRol::create([
+                        'empleado_id' => $empleadoNuevo->id,
+                        'rol_id' => $rol->id
+                    ]);
+                }
             }
+            session()->flash('success', "Datos guardados correctamente");
+        } catch (\Exception $e) {
+            session()->flash('error', "Debe agregar los datos obligatorios");
         }
-
         return Redirect::to('/empleados');
     }
 
@@ -68,11 +72,15 @@ class GestionController extends Controller
      */
     public function show($id)
     {
-        $empleados = Empleado::seleccionar();
-        if ($id) {
-            return ['empleado' => $empleados->find($id), 'roles' => EmpleadoRol::where('empleado_id', $id)->get()];
-        } else {
-            return $empleados->get();
+        try {
+            $empleados = Empleado::seleccionar();
+            if ($id) {
+                return ['empleado' => $empleados->find($id), 'roles' => EmpleadoRol::where('empleado_id', $id)->get()];
+            } else {
+                return $empleados->get();
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', "Empleado no encontrado");
         }
     }
 
@@ -96,26 +104,30 @@ class GestionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Empleado::find($request->id)
-            ->update([
-                "nombre" => $request->nombreM,
-                "email" => $request->correoM,
-                "sexo" => $request->sexoM,
-                "area_id" => $request->areaM,
-                "descripcion" => $request->descripcionM,
-                "boletin" => isset($request->boletinM) ? 1 : 0
-            ]);
-
-        EmpleadoRol::where('empleado_id', $request->id)->delete();
-        foreach (Rol::all() as $rol) {
-            if ($request->get("rol$rol->id" . "M")) {
-                EmpleadoRol::create([
-                    'empleado_id' => $request->id,
-                    'rol_id' => $rol->id
+        try {
+            Empleado::find($request->id)
+                ->update([
+                    "nombre" => $request->nombreM,
+                    "email" => $request->correoM,
+                    "sexo" => $request->sexoM,
+                    "area_id" => $request->areaM,
+                    "descripcion" => $request->descripcionM,
+                    "boletin" => isset($request->boletinM) ? 1 : 0
                 ]);
-            }
-        }
 
+            EmpleadoRol::where('empleado_id', $request->id)->delete();
+            foreach (Rol::all() as $rol) {
+                if ($request->get("rol$rol->id" . "M")) {
+                    EmpleadoRol::create([
+                        'empleado_id' => $request->id,
+                        'rol_id' => $rol->id
+                    ]);
+                }
+            }
+            session()->flash('success', "Datos guardados correctamente");
+        } catch (\Exception $e) {
+            session()->flash('error', "Debe agregar los datos obligatorios");
+        }
         return Redirect::to('/empleados');
     }
 

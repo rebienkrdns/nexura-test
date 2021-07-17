@@ -7,6 +7,7 @@
     <title>Nexura Test</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -230,6 +231,14 @@
         crossorigin="anonymous"></script>
 <script src="https://kit.fontawesome.com/5ce803a603.js" crossorigin="anonymous"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 <script src="{{ asset('js/app.js') }}"></script>
+<script>
+    @if(session()->has('error'))
+        toastr["warning"]("{{ session('error') }}", "");
+    @elseif(session()->has('success'))
+        toastr["success"]("{{ session('success') }}", "");
+    @endif
+</script>
 </body>
 </html>
